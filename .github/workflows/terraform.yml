@@ -17,3 +17,4 @@ jobs:
 
       - name: Verify Subscription
         run: az account show
+   
