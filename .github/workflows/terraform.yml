@@ -5,7 +5,7 @@ on: [push]
 jobs:
   deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -16,7 +16,7 @@ jobs:
             -u "${{ secrets.AZURE_APP_ID }}" \
             -p "${{ secrets.AZURE_SECRET }}" \
             --tenant "${{ secrets.AZURE_TENANT_ID }}"
-          
+
           az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Verify Subscription
