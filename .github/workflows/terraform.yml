@@ -1,31 +1,19 @@
-name: Terraform Auto Deploy (Azure)
-on:
-  push:
-    branches:
-      - main  # ✅ Jab bhi main branch pe koi push hoga, yeh workflow chalega.
+name: Azure Deployment
+
+on: [push]
 
 jobs:
-  terraform:
-    runs-on: ubuntu-latest  # ✅ GitHub Actions ka runner (Ubuntu use ho raha hai).
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3  # ✅ Yeh step repo ke latest code ko fetch karega.
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0  # ✅ Terraform ka version define karo.
+      - name: Azure CLI Login (Managed Identity)
+        run: |
+          az login --identity --allow-no-subscriptions
+          az account set --subscription "<YOUR_SUBSCRIPTION_ID>"
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # ✅ Yeh `AZURE_CREDENTIALS` ko GitHub Secrets se fetch karega.
-          # 👇 Yeh Azure ke credentials hai, jo `GitHub Secrets` me store hone chahiye:
-          # - clientId
-          # - clientSecret
-          # - subscriptionId
-          # - tenantId
-
-      - name: Initialize Terraform
-        run: terraform init  #
+      - name: Verify Subscription
+        run: az account show
