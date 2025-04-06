@@ -1,4 +1,4 @@
-name: 'Terraform Deployment on Azure'
+name: 'Terraform'
 
 on:
   push:
@@ -10,22 +10,17 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Terraform Job'
+    name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: production
 
-    defaults:
-      run:
-        shell: bash
-
-    env:  # ✅ Azure credentials as environment variables
+    env:  # ✅ Azure credentials passed via env
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout repo
       uses: actions/checkout@v4
 
     - name: Setup Terraform
@@ -36,8 +31,8 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    - name: Terraform Format Check
-      run: terraform fmt -check || echo "Format check failed, but continuing"
+    - name: Terraform Format
+      run: terraform fmt -check || echo "Format check failed"
 
     - name: Terraform Plan
       run: terraform plan
