@@ -1,36 +1,51 @@
-name: 'Terraform'
+name: 'Terraform Azure Deployment'
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   terraform:
-    name: 'Terraform Plan/Apply'
+    name: 'Terraform'
     runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
 
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
 
+      # ✅ DEBUG ENV VARS STEP (SAFE)
       - name: Debug ENV Vars
         run: |
-          echo "Client ID: ${ARM_CLIENT_ID}"
-          echo "Tenant ID: ${ARM_TENANT_ID}"
-          echo "Subscription ID: ${ARM_SUBSCRIPTION_ID}"
+          echo "ARM_CLIENT_ID: $ARM_CLIENT_ID"
+          echo "ARM_TENANT_ID: $ARM_TENANT_ID"
+          echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
+          echo "ARM_CLIENT_SECRET: *** (masked for security)"
 
       - name: Terraform Init
         run: terraform init
+
+      - name: Terraform Format
+        run: terraform fmt -check || echo "Terraform format check failed, but continuing"
 
       - name: Terraform Plan
         run: terraform plan
