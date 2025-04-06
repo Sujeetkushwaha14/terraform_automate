@@ -5,38 +5,36 @@ on:
     branches: [ "main" ]
   pull_request:
 
-permissions:
-  contents: read
-
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform Plan/Apply'
     runs-on: ubuntu-latest
 
-    env:  # ✅ Azure credentials passed via env
+    env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_wrapper: false
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Debug ENV Vars
+        run: |
+          echo "Client ID: ${ARM_CLIENT_ID}"
+          echo "Tenant ID: ${ARM_TENANT_ID}"
+          echo "Subscription ID: ${ARM_SUBSCRIPTION_ID}"
 
-    - name: Terraform Format
-      run: terraform fmt -check || echo "Format check failed"
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan
+      - name: Terraform Plan
+        run: terraform plan
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve
