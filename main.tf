@@ -10,7 +10,7 @@ terraform {
 provider "azurerm" {
 features { }
 }
-resource "azurerm_resource_group" "git" {
-  name = "git-test-auto"
+resource "azurerm_resource_group" "gitHUB" {
+  name = "git-test-auto1"
   location = "westus"
 }
